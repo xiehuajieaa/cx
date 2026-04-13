@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台管理系统</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #000000;
+            --sidebar-width: 260px;
+            --bg-color: #f8f9fa;
+        }
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: white;
+            border-right: 1px solid #eee;
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        .sidebar-header {
+            padding: 30px 25px;
+            border-bottom: 1px solid #f5f5f5;
+            text-align: center;
+        }
+        .sidebar-header h4 {
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        .nav-menu {
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+        .nav-item {
+            padding: 5px 20px;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #666;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .nav-link i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: #f0f0f0;
+            color: var(--primary-color);
+        }
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid #f5f5f5;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex-grow: 1;
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+        }
+        .content-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            background-color: white;
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table thead th {
+            background-color: #fafafa;
+            color: #888;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 15px 25px;
+            border-bottom: 1px solid #eee;
+        }
+        .table tbody td {
+            padding: 15px 25px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f8f8f8;
+        }
+        .btn-black {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            padding: 8px 20px;
+            transition: all 0.3s;
+        }
+        .btn-black:hover {
+            background-color: #333;
+            color: white;
+        }
+        .btn-outline-black {
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 8px;
+            padding: 5px 15px;
+        }
+        .btn-outline-black:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .product-thumb {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .section-view {
+            display: none;
+        }
+        .section-view.active {
+            display: block;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+            }
+            .sidebar-header h4, .nav-link span {
+                display: none;
+            }
+            .main-content {
+                margin-left: 70px;
+            }
+            .nav-link i {
+                margin-right: 0;
+            }
+        }
+        .gallery-item:hover {
+            background-color: #f0f0f0;
+            border-color: var(--primary-color) !important;
+        }
+        /* 修复多层模态框显示与层级 */
+        .modal {
+            background-color: rgba(0,0,0,0.2);
+        }
+        #galleryModal {
+            z-index: 1070;
+        }
+        #galleryModal .modal-backdrop {
+            display: none; /* 禁用第二层背景，防止叠加变黑 */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4>产品后台管理平台</h4>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item">
+                <a href="#" class="nav-link active" onclick="switchView('products', this)">
+                    <i class="bi bi-box-seam"></i>
+                    <span>产品管理</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="switchView('productTypes', this)">
+                    <i class="bi bi-tags"></i>
+                    <span>产品类型管理</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="switchView('templates', this)">
+                    <i class="bi bi-layout-text-window-reverse"></i>
+                    <span>模板管理</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="switchView('admins', this)">
+                    <i class="bi bi-people"></i>
+                    <span>管理员管理</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="switchView('logs', this)">
+                    <i class="bi bi-journal-text"></i>
+                    <span>系统日志</span>
+                </a>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="mb-3 px-3">
+                <div class="small text-muted mb-1">当前管理员</div>
+                <div class="fw-bold" id="currentAdminName">加载中...</div>
+            </div>
+            <a href="#" class="nav-link text-danger" onclick="logout(); return false;">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>退出登录</span>
+            </a>
+            <a href="index.html" class="nav-link">
+                <i class="bi bi-house-door"></i>
+                <span>返回首页</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Products View -->
+        <div id="productsView" class="section-view active">
+            <div class="content-header">
+                <h2>产品管理</h2>
+                <div class="d-flex gap-2">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-black dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            批量操作
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="openBatchImport()"><i class="bi bi-file-earmark-arrow-up me-2"></i>批量导入</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportCheckedProducts()"><i class="bi bi-file-earmark-arrow-down me-2"></i>批量导出</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportAllProducts()"><i class="bi bi-file-earmark-spreadsheet me-2"></i>全部导出</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="openBatchEdit()"><i class="bi bi-pencil-square me-2"></i>批量修改</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="batchDelete()"><i class="bi bi-trash me-2"></i>批量删除</a></li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-black" data-bs-toggle="modal" data-bs-target="#productModal" onclick="resetProductForm()">
+                        <i class="bi bi-plus-lg me-2"></i>添加新产品
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">搜索产品</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" id="searchKeyword" class="form-control border-start-0" placeholder="产品名称/型号/SN" onkeyup="if(event.keyCode==13) loadProducts(1)">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">产品类型</label>
+                            <select id="filterType" class="form-select" onchange="loadProducts(1)">
+                                <option value="">所有类型</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted">每页显示</label>
+                            <select id="pageSize" class="form-select" onchange="loadProducts(1)">
+                                <option value="5">5 个</option>
+                                <option value="10" selected>10 个</option>
+                                <option value="50">50 个</option>
+                                <option value="100">100 个</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button class="btn btn-outline-black me-2" onclick="loadProducts(1)">筛选</button>
+                            <button class="btn btn-light" onclick="resetFilters()">重置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">
+                                    <input type="checkbox" class="form-check-input" id="selectAll" onclick="toggleSelectAll(this.checked)">
+                                </th>
+                                <th>图片</th>
+                                <th>产品名称</th>
+                                <th>型号</th>
+                                <th>类型</th>
+                                <th>序列号</th>
+                                <th>制造日期</th>
+                                <th>保修至</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productList">
+                            <!-- JS Load -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <div class="card-footer bg-white border-0 p-4 d-flex justify-content-between align-items-center">
+                    <div id="paginationInfo" class="small text-muted">正在加载...</div>
+                    <nav>
+                        <ul id="pagination" class="pagination pagination-sm mb-0">
+                            <!-- JS Load -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Types View -->
+        <div id="productTypesView" class="section-view">
+            <div class="content-header">
+                <h2>产品类型管理</h2>
+                <button class="btn btn-black" data-bs-toggle="modal" data-bs-target="#typeModal" onclick="resetTypeForm()">
+                    <i class="bi bi-tag me-2"></i>添加新类型
+                </button>
+            </div>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>类型名称</th>
+                                <th>SN 前缀</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="typeList">
+                            <!-- JS Load -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Templates View -->
+        <div id="templatesView" class="section-view">
+            <div class="content-header">
+                <h2>模板管理</h2>
+                <div class="text-muted small">保存常用产品信息为模板，添加产品时可一键导入</div>
+            </div>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>模板名称</th>
+                                <th>产品名称</th>
+                                <th>型号</th>
+                                <th>类型</th>
+                                <th>保修月数</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="templateList">
+                            <!-- JS Load -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admins View -->
+        <div id="adminsView" class="section-view">
+            <div class="content-header">
+                <h2>管理员管理</h2>
+                <button id="addAdminBtn" class="btn btn-black" data-bs-toggle="modal" data-bs-target="#adminModal" onclick="resetAdminForm()" style="display:none;">
+                    <i class="bi bi-person-plus me-2"></i>添加管理员
+                </button>
+            </div>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户名</th>
+                                <th>创建时间</th>
+                                <th class="admin-only-cell" style="display:none;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminList">
+                            <!-- JS Load -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs View -->
+        <div id="logsView" class="section-view">
+            <div class="content-header">
+                <h2>系统日志</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-black" onclick="loadLogs(1)">
+                        <i class="bi bi-arrow-clockwise me-1"></i>刷新日志
+                    </button>
+                    <div id="adminLogControls" class="d-flex gap-2" style="display:none !important;">
+                        <div class="form-check form-switch me-3 d-flex align-items-center">
+                            <input class="form-check-input me-2" type="checkbox" id="logEnabledSwitch" onchange="updateLogConfig()">
+                            <label class="form-check-label small text-muted" for="logEnabledSwitch">日志开关</label>
+                        </div>
+                        <div class="input-group input-group-sm" style="width: 200px;">
+                            <span class="input-group-text bg-white border-end-0 text-muted">保留</span>
+                            <input type="number" id="logRetentionInput" class="form-control border-start-0 border-end-0" placeholder="天数" onchange="updateLogConfig()">
+                            <span class="input-group-text bg-white border-start-0 text-muted">天</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="clearLogs()">
+                            <i class="bi bi-trash me-1"></i>清空日志
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>管理员</th>
+                                <th>操作</th>
+                                <th>详情</th>
+                                <th>IP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logList">
+                            <!-- JS Load -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <div class="card-footer bg-white border-0 p-4 d-flex justify-content-between align-items-center">
+                    <div id="logPaginationInfo" class="small text-muted">正在加载...</div>
+                    <nav>
+                        <ul id="logPagination" class="pagination pagination-sm mb-0">
+                            <!-- JS Load -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Product Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border-radius: 20px;">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="modal-title fw-bold" id="productModalTitle">添加新产品</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="templateSelectRow" class="mb-4 p-3 bg-light rounded-3">
+                        <label class="form-label small fw-bold">从模板导入 (快速填充)</label>
+                        <select id="pTemplateApply" class="form-select" onchange="applyTemplate(this.value)">
+                            <option value="">-- 请选择模板 --</option>
+                        </select>
+                    </div>
+                    <form id="productForm" onsubmit="return false;">
+                        <input type="hidden" id="productId">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">产品名称</label>
+                                <input type="text" id="pName" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">产品型号</label>
+                                <input type="text" id="pModel" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">SN 码 (物理标签)</label>
+                                <input type="text" id="pSnCode" class="form-control" placeholder="物理产品上的 SN">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">产品类型</label>
+                                <select id="pType" class="form-select" required>
+                                    <!-- JS Load -->
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">销售渠道</label>
+                                <input type="text" id="pSalesChannel" class="form-control" placeholder="如: 天猫、京东、线下门店">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">制造日期</label>
+                                <input type="date" id="pMfgDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">保修月数</label>
+                                <input type="number" id="pWarrantyMonths" class="form-control" value="12" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">电子手册链接</label>
+                                <input type="url" id="pManualLink" class="form-control" placeholder="https://example.com/manual.pdf">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label small text-muted">产品图片</label>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-outline-dark btn-sm" onclick="openGallery()">从图库选择</button>
+                                    <input type="file" id="pImageFile" class="form-control form-control-sm" onchange="uploadImage()">
+                                </div>
+                                <input type="hidden" id="pImagePath">
+                                <div id="uploadStatus" class="form-text mt-1"></div>
+                                <div id="imagePreviewContainer" class="mt-2" style="display:none;">
+                                    <img id="imagePreview" src="" class="rounded border" style="max-width: 150px; max-height: 150px; object-fit: contain;">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label small text-muted">备注信息</label>
+                                <textarea id="pRemarks" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-outline-dark rounded-pill px-4" onclick="saveAsTemplate()">存为模板</button>
+                    <div class="flex-grow-1"></div>
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-black rounded-pill px-4" onclick="saveProduct()">保存产品</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch Import Modal -->
+    <div class="modal fade" id="batchImportModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 20px;">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="modal-title fw-bold">批量导入产品</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="alert alert-info small">
+                        请上传 Excel 格式的产品数据文件 (.xlsx 或 .xls)。<br>
+                        <strong>表头要求 (第一行)：</strong><br>
+                        产品名称, 产品型号, 产品类型, 制造日期, 保修月数, 物理SN, 销售渠道, 手册链接, 备注<br>
+                        <span class="text-muted">* 制造日期格式建议: 2024-01-01</span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">选择 Excel 文件</label>
+                        <input type="file" id="batchImportFile" class="form-control" accept=".xlsx, .xls">
+                    </div>
+                    <div id="importProgress" class="mt-2 small text-primary" style="display:none;">正在处理并导入中...</div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-black rounded-pill px-4" onclick="doBatchImport()">开始导入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Batch Edit Modal -->
+    <div class="modal fade" id="batchEditModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 20px;">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="modal-title fw-bold">批量修改所选产品</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="small text-muted mb-3">已选择 <span id="selectedCount" class="fw-bold text-dark">0</span> 个产品</p>
+                    <form id="batchEditForm">
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">要修改的字段</label>
+                            <select id="batchEditField" class="form-select" onchange="onBatchEditFieldChange(this.value)">
+                                <option value="">-- 请选择 --</option>
+                                <option value="product_type">产品类型</option>
+                                <option value="product_name">产品名称</option>
+                                <option value="product_model">产品型号</option>
+                                <option value="warranty_months">保修月数</option>
+                                <option value="sales_channel">销售渠道</option>
+                                <option value="manual_link">手册链接</option>
+                            </select>
+                        </div>
+                        <div id="batchEditValueContainer" class="mb-3" style="display: none;">
+                            <label class="form-label small text-muted">新值</label>
+                            <div id="batchEditValueInput">
+                                <!-- Dynamic Input -->
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-black rounded-pill px-4" onclick="doBatchEdit()">保存修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Modal -->
+    <div class="modal fade" id="adminModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 20px;">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="modal-title fw-bold" id="adminModalTitle">添加管理员</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="adminForm" onsubmit="return false;">
+                        <input type="hidden" id="adminId">
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">用户名</label>
+                            <input type="text" id="adminUsername" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">密码</label>
+                            <input type="password" id="adminPassword" class="form-control" placeholder="留空则不修改密码">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-black rounded-pill px-4" onclick="saveAdmin()">保存管理员</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Type Modal -->
+    <div class="modal fade" id="typeModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 20px;">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="modal-title fw-bold" id="typeModalTitle">添加新类型</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="typeForm" onsubmit="return false;">
+                        <input type="hidden" id="typeId">
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">类型名称 (如: 投影仪)</label>
+                            <input type="text" id="typeName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">SN 前缀 (如: PROJ)</label>
+                            <input type="text" id="typePrefix" class="form-control" required style="text-transform: uppercase;">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-black rounded-pill px-4" onclick="saveType()">保存类型</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Modal -->
+    <div class="modal fade" id="galleryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border-radius: 20px;">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="modal-title fw-bold">图片库</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="galleryList" class="row g-3">
+                        <!-- JS Load -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        let products = [];
+        let admins = [];
+        let productTypes = [];
+        let productTemplates = [];
+        let galleryImages = [];
+        let systemLogs = [];
+        let currentAdminUsername = '';
+        
+        // 分页状态
+        let currentPage = 1;
+        let totalProducts = 0;
+        let pageSize = 10;
+        
+        // 日志分页状态
+        let currentLogPage = 1;
+        let totalLogs = 0;
+        let logPageSize = 20;
+
+        // 安全转义 HTML 字符
+        function escapeHTML(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // 页面初始化：检查登录状态
+        async function checkAuth() {
+            try {
+                const res = await fetch('./api/admin/check_auth.php');
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // 确保获取到了用户名
+                if (data && data.username) {
+                    currentAdminUsername = data.username;
+                    document.getElementById('currentAdminName').innerText = data.username;
+                    
+                    // 只有 admin 用户可以看到日志控制按钮和管理员操作按钮
+                    if (currentAdminUsername === 'admin') {
+                        const logControls = document.getElementById('adminLogControls');
+                        if (logControls) {
+                            logControls.style.setProperty('display', 'flex', 'important');
+                        }
+                        
+                        const addAdminBtn = document.getElementById('addAdminBtn');
+                        if (addAdminBtn) {
+                            addAdminBtn.style.display = 'block';
+                        }
+                        
+                        document.querySelectorAll('.admin-only-cell').forEach(el => {
+                            el.style.display = 'table-cell';
+                        });
+                    }
+                } else {
+                    document.getElementById('currentAdminName').innerText = '未知管理员';
+                }
+                
+                loadProducts();
+                loadAdmins();
+                loadTypes();
+                loadTemplates();
+                loadLogs();
+            } catch (e) {
+                console.error('Auth check error:', e);
+                window.location.href = 'login.html';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            
+            // 监听图库弹窗显示，实时加载图片
+            const galleryModalEl = document.getElementById('galleryModal');
+            galleryModalEl.addEventListener('show.bs.modal', loadGallery);
+            
+            // 关键修复：关闭图库后恢复主窗口滚动并确保主窗口依然显示
+            galleryModalEl.addEventListener('hidden.bs.modal', () => {
+                if (document.getElementById('productModal').classList.contains('show')) {
+                    document.body.classList.add('modal-open');
+                }
+            });
+        });
+
+        async function logout() {
+            if (!confirm('确定退出登录吗？')) return;
+            try {
+                const res = await fetch('./api/admin/logout.php');
+                if (res.ok) window.location.href = 'login.html';
+            } catch (e) { alert('登出失败'); }
+        }
+
+        function switchView(view, el) {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            el.classList.add('active');
+
+            document.querySelectorAll('.section-view').forEach(v => v.classList.remove('active'));
+            document.getElementById(view + 'View').classList.add('active');
+        }
+
+        // --- Products Logic ---
+        async function loadProducts(page = 1) {
+            currentPage = page;
+            pageSize = document.getElementById('pageSize').value;
+            const search = document.getElementById('searchKeyword').value;
+            const type = document.getElementById('filterType').value;
+            
+            try {
+                const res = await fetch(`./api/admin/list.php?page=${currentPage}&limit=${pageSize}&search=${encodeURIComponent(search)}&type=${encodeURIComponent(type)}`);
+                const data = await res.json();
+                products = data.products;
+                totalProducts = data.total;
+                renderProducts();
+                renderPagination();
+            } catch (e) { console.error(e); }
+        }
+
+        function resetFilters() {
+            document.getElementById('searchKeyword').value = '';
+            document.getElementById('filterType').value = '';
+            document.getElementById('pageSize').value = '10';
+            loadProducts(1);
+        }
+
+        function renderProducts() {
+            const list = document.getElementById('productList');
+            if (products.length === 0) {
+                list.innerHTML = '<tr><td colspan="9" class="text-center py-5 text-muted">暂无符合条件的产品</td></tr>';
+                return;
+            }
+            list.innerHTML = products.map(p => `
+                <tr>
+                    <td><input type="checkbox" class="form-check-input product-check" value="${p.id}"></td>
+                    <td><img src="${p.image_url || 'https://via.placeholder.com/50'}" class="product-thumb"></td>
+                    <td>${escapeHTML(p.product_name)}</td>
+                    <td>${escapeHTML(p.product_model)}</td>
+                    <td><span class="badge bg-light text-dark">${escapeHTML(p.product_type)}</span></td>
+                    <td><code>${escapeHTML(p.sn)}</code></td>
+                    <td>${escapeHTML(p.manufacturing_date)}</td>
+                    <td><span class="text-danger fw-bold">${escapeHTML(p.expiry_date)}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-black me-2" onclick="editProduct(${p.id})">修改</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(${p.id})">删除</button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // 重置全选状态
+            document.getElementById('selectAll').checked = false;
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(totalProducts / pageSize);
+            const info = document.getElementById('paginationInfo');
+            const list = document.getElementById('pagination');
+            
+            info.innerText = `共 ${totalProducts} 条数据，当前第 ${currentPage} / ${totalPages || 1} 页`;
+            
+            let html = '';
+            // 上一页
+            html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadProducts(${currentPage - 1}); return false;">上一页</a>
+            </li>`;
+            
+            // 页码 (简单处理，显示当前页附近的页码)
+            let start = Math.max(1, currentPage - 2);
+            let end = Math.min(totalPages, start + 4);
+            if (end - start < 4) start = Math.max(1, end - 4);
+            
+            for (let i = start; i <= end; i++) {
+                html += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link ${i === currentPage ? 'bg-black border-black' : ''}" href="#" onclick="loadProducts(${i}); return false;">${i}</a>
+                </li>`;
+            }
+            
+            // 下一页
+            html += `<li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadProducts(${currentPage + 1}); return false;">下一页</a>
+            </li>`;
+            
+            list.innerHTML = html;
+        }
+
+        function toggleSelectAll(checked) {
+            document.querySelectorAll('.product-check').forEach(cb => cb.checked = checked);
+        }
+
+        function getSelectedProductIds() {
+            return Array.from(document.querySelectorAll('.product-check:checked')).map(cb => cb.value);
+        }
+
+        async function batchDelete() {
+            const ids = getSelectedProductIds();
+            if (ids.length === 0) return alert('请先选择要删除的产品');
+            
+            if (!confirm(`确定要批量删除这 ${ids.length} 个产品吗？`)) return;
+            
+            try {
+                const res = await fetch('./api/admin/batch_delete.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: ids })
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    alert('批量删除成功');
+                    loadProducts(currentPage);
+                } else { alert('批量删除失败: ' + result.error); }
+            } catch (e) { alert('批量删除出错'); }
+        }
+
+        function openBatchImport() {
+            new bootstrap.Modal(document.getElementById('batchImportModal')).show();
+        }
+
+        async function doBatchImport() {
+            const fileInput = document.getElementById('batchImportFile');
+            if (!fileInput.files.length) return alert('请选择要导入的 Excel 文件');
+            
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            document.getElementById('importProgress').style.display = 'block';
+            
+            reader.onload = async (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    // 将 Excel 转换为 JSON
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                    
+                    if (jsonData.length === 0) {
+                        throw new Error('Excel 文件中没有有效数据');
+                    }
+                    
+                    // 映射表头到后端字段
+                    // 映射表头 (中文 -> 英文)
+                    const products = jsonData.map(row => {
+                        return {
+                            product_name: row['产品名称'] || row['Name'],
+                            product_model: row['产品型号'] || row['Model'],
+                            product_type: row['产品类型'] || row['Type'],
+                            manufacturing_date: formatExcelDate(row['制造日期']),
+                            warranty_months: parseInt(row['保修月数']) || 12,
+                            sn_code: row['物理SN'] || row['SN'],
+                            sales_channel: row['销售渠道'] || '',
+                            manual_link: row['手册链接'] || '',
+                            remarks: row['备注'] || ''
+                        };
+                    });
+                    
+                    const res = await fetch('./api/admin/batch_add.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ products: products })
+                    });
+                    
+                    const result = await res.json();
+                    if (res.ok) {
+                        alert(`成功导入 ${result.count} 条产品数据`);
+                        bootstrap.Modal.getInstance(document.getElementById('batchImportModal')).hide();
+                        loadProducts(1);
+                    } else { 
+                        alert('导入失败: ' + result.error + (result.details ? '\n' + result.details.join('\n') : '')); 
+                    }
+                } catch (err) { 
+                    console.error(err);
+                    alert('文件解析或导入失败: ' + err.message); 
+                } finally {
+                    document.getElementById('importProgress').style.display = 'none';
+                    fileInput.value = ''; // 清空选择，方便下次操作
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // 辅助函数：处理 Excel 日期格式 (Excel 有时会把日期存为数字)
+        function formatExcelDate(date) {
+            if (!date) return new Date().toISOString().split('T')[0];
+            if (typeof date === 'number') {
+                const d = XLSX.utils.format_cell({ v: date, t: 'd' });
+                // 这里可能需要进一步转换，或者简单点：
+                const excelEpoch = new Date(1899, 11, 30);
+                const jsDate = new Date(excelEpoch.getTime() + date * 86400000);
+                return jsDate.toISOString().split('T')[0];
+            }
+            // 如果是字符串，直接返回
+            return date;
+        }
+
+        function openBatchEdit() {
+            const ids = getSelectedProductIds();
+            if (ids.length === 0) return alert('请先选择要修改的产品');
+            
+            document.getElementById('selectedCount').innerText = ids.length;
+            document.getElementById('batchEditField').value = '';
+            document.getElementById('batchEditValueContainer').style.display = 'none';
+            new bootstrap.Modal(document.getElementById('batchEditModal')).show();
+        }
+
+        function onBatchEditFieldChange(field) {
+            const container = document.getElementById('batchEditValueContainer');
+            const inputArea = document.getElementById('batchEditValueInput');
+            
+            if (!field) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'block';
+            if (field === 'product_type') {
+                inputArea.innerHTML = `<select id="batchEditValue" class="form-select">
+                    ${productTypes.map(t => `<option value="${t.type_name}">${t.type_name}</option>`).join('')}
+                </select>`;
+            } else if (field === 'warranty_months') {
+                inputArea.innerHTML = `<input type="number" id="batchEditValue" class="form-control" placeholder="请输入月数">`;
+            } else {
+                inputArea.innerHTML = `<input type="text" id="batchEditValue" class="form-control" placeholder="请输入新内容">`;
+            }
+        }
+
+        async function doBatchEdit() {
+            const ids = getSelectedProductIds();
+            const field = document.getElementById('batchEditField').value;
+            const value = document.getElementById('batchEditValue').value;
+            
+            if (!field || !value) return alert('请填写要修改的字段和新值');
+            
+            try {
+                const fields = {};
+                fields[field] = value;
+                
+                const res = await fetch('./api/admin/batch_edit.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: ids, fields: fields })
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    alert('批量修改成功');
+                    bootstrap.Modal.getInstance(document.getElementById('batchEditModal')).hide();
+                    loadProducts(currentPage);
+                } else { alert('批量修改失败: ' + result.error); }
+            } catch (e) { alert('批量修改出错'); }
+        }
+
+        // --- Export Excel Logic ---
+        function exportToExcel(data, fileName) {
+            if (!data || data.length === 0) {
+                alert('没有可导出的数据');
+                return;
+            }
+
+            // 映射字段名为中文表头
+            const exportData = data.map(p => ({
+                '产品名称': p.product_name,
+                '产品型号': p.product_model,
+                '产品类型': p.product_type,
+                '序列号': p.sn,
+                '物理SN': p.sn_code || '',
+                '制造日期': p.manufacturing_date,
+                '保修月数': p.warranty_months,
+                '保修至': p.expiry_date,
+                '销售渠道': p.sales_channel || '',
+                '手册链接': p.manual_link || '',
+                '备注': p.remarks || ''
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
+            XLSX.writeFile(workbook, `${fileName}_${new Date().getTime()}.xlsx`);
+        }
+
+        function exportCheckedProducts() {
+            const ids = getSelectedProductIds();
+            if (ids.length === 0) return alert('请先选择要导出的产品');
+
+            const selectedProducts = products.filter(p => ids.includes(p.id.toString()));
+            exportToExcel(selectedProducts, 'Selected_Products');
+        }
+
+        async function exportAllProducts() {
+            if (!confirm('确定要导出所有产品数据吗？')) return;
+
+            try {
+                // 获取所有产品（不分页）
+                const res = await fetch('./api/admin/list.php?page=1&limit=999999');
+                const data = await res.json();
+                if (res.ok && data.products) {
+                    exportToExcel(data.products, 'All_Products');
+                } else {
+                    alert('获取数据失败');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('导出出错');
+            }
+        }
+
+        function resetProductForm() {
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('pImagePath').value = '';
+            document.getElementById('productModalTitle').innerText = '添加新产品';
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('uploadStatus').innerText = '';
+            
+            // 刷新类型下拉框
+            const typeSelect = document.getElementById('pType');
+            typeSelect.innerHTML = productTypes.map(t => `<option value="${t.type_name}">${t.type_name} (${t.sn_prefix})</option>`).join('');
+            
+            // 刷新模板下拉框
+            const templateSelect = document.getElementById('pTemplateApply');
+            templateSelect.innerHTML = '<option value="">-- 请选择模板 --</option>' + 
+                productTemplates.map(t => `<option value="${t.id}">${t.template_name}</option>`).join('');
+        }
+
+        async function uploadImage() {
+            const fileInput = document.getElementById('pImageFile');
+            const status = document.getElementById('uploadStatus');
+            const preview = document.getElementById('imagePreview');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            
+            if (!fileInput.files.length) return;
+            
+            const file = fileInput.files[0];
+            
+            // 前端验证文件类型
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                status.innerText = '不支持的文件格式';
+                status.className = 'form-text text-danger';
+                return;
+            }
+            
+            // 前端验证文件大小
+            if (file.size > 5 * 1024 * 1024) {
+                status.innerText = '文件大小不能超过 5MB';
+                status.className = 'form-text text-danger';
+                return;
+            }
+            
+            status.innerText = '上传中...';
+            status.className = 'form-text text-muted';
+            
+            // 显示预览
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const res = await fetch('./api/admin/upload.php', { 
+                    method: 'POST', 
+                    body: formData,
+                    credentials: 'same-origin' // 确保携带会话信息
+                });
+                
+                if (!res.ok) {
+                    throw new Error('服务器响应错误: ' + res.status);
+                }
+                
+                const result = await res.json();
+                
+                if (result.error) {
+                    status.innerText = '上传失败: ' + result.error;
+                    status.className = 'form-text text-danger';
+                } else {
+                    document.getElementById('pImagePath').value = result.path;
+                    status.innerText = '上传成功';
+                    status.className = 'form-text text-success';
+                }
+            } catch (e) {
+                console.error('上传错误:', e);
+                status.innerText = '上传出错: ' + e.message;
+                status.className = 'form-text text-danger';
+            }
+        }
+
+        async function saveProduct() {
+            const id = document.getElementById('productId').value;
+            const data = {
+                id: id,
+                sn_code: document.getElementById('pSnCode').value,
+                product_name: document.getElementById('pName').value,
+                product_model: document.getElementById('pModel').value,
+                product_type: document.getElementById('pType').value,
+                manufacturing_date: document.getElementById('pMfgDate').value,
+                warranty_months: document.getElementById('pWarrantyMonths').value,
+                sales_channel: document.getElementById('pSalesChannel').value,
+                manual_link: document.getElementById('pManualLink').value,
+                remarks: document.getElementById('pRemarks').value,
+                image: document.getElementById('pImagePath').value
+            };
+            const url = id ? './api/admin/edit.php' : './api/admin/add.php';
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    alert(id ? '修改成功' : '添加成功，序列号: ' + result.sn);
+                    bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+                    loadProducts();
+                } else { alert('保存失败: ' + result.error); }
+            } catch (e) { alert('保存出错'); }
+        }
+
+        function editProduct(id) {
+            const p = products.find(i => i.id == id);
+            if (!p) return;
+            
+            resetProductForm(); // 确保下拉框已加载
+            
+            document.getElementById('productId').value = p.id;
+            document.getElementById('pSnCode').value = p.sn_code || '';
+            document.getElementById('pName').value = p.product_name;
+            document.getElementById('pModel').value = p.product_model;
+            document.getElementById('pType').value = p.product_type;
+            document.getElementById('pMfgDate').value = p.manufacturing_date;
+            document.getElementById('pWarrantyMonths').value = p.warranty_months;
+            document.getElementById('pSalesChannel').value = p.sales_channel || '';
+            document.getElementById('pManualLink').value = p.manual_link || '';
+            document.getElementById('pRemarks').value = p.remarks || '';
+            document.getElementById('pImagePath').value = p.image || '';
+            
+            if (p.image_url) {
+                document.getElementById('imagePreview').src = p.image_url;
+                document.getElementById('imagePreviewContainer').style.display = 'block';
+            }
+            
+            document.getElementById('productModalTitle').innerText = '修改产品';
+            new bootstrap.Modal(document.getElementById('productModal')).show();
+        }
+
+        // --- Template Logic ---
+        async function loadTemplates() {
+            try {
+                const res = await fetch('./api/admin/template_list.php');
+                productTemplates = await res.json();
+                renderTemplates();
+            } catch (e) { console.error(e); }
+        }
+
+        function renderTemplates() {
+            const list = document.getElementById('templateList');
+            list.innerHTML = productTemplates.map(t => `
+                <tr>
+                    <td>${escapeHTML(t.template_name)}</td>
+                    <td>${escapeHTML(t.product_name)}</td>
+                    <td>${escapeHTML(t.product_model)}</td>
+                    <td><span class="badge bg-light text-dark">${escapeHTML(t.product_type)}</span></td>
+                    <td>${escapeHTML(t.warranty_months)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteTemplate(${t.id})">删除</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function applyTemplate(id) {
+            if (!id) return;
+            const t = productTemplates.find(item => item.id == id);
+            if (!t) return;
+            
+            document.getElementById('pName').value = t.product_name;
+            document.getElementById('pModel').value = t.product_model;
+            document.getElementById('pType').value = t.product_type;
+            document.getElementById('pWarrantyMonths').value = t.warranty_months;
+            document.getElementById('pSalesChannel').value = t.sales_channel || '';
+            document.getElementById('pManualLink').value = t.manual_link || '';
+            document.getElementById('pRemarks').value = t.remarks || '';
+            document.getElementById('pImagePath').value = t.image || '';
+            
+            if (t.image) {
+                // 需要一个预览逻辑
+                document.getElementById('imagePreview').src = './' + t.image;
+                document.getElementById('imagePreviewContainer').style.display = 'block';
+            }
+        }
+
+        async function saveAsTemplate() {
+            const name = prompt('请输入模板名称:');
+            if (!name) return;
+
+            const data = {
+                template_name: name,
+                product_type: document.getElementById('pType').value,
+                product_name: document.getElementById('pName').value,
+                product_model: document.getElementById('pModel').value,
+                warranty_months: document.getElementById('pWarrantyMonths').value,
+                sales_channel: document.getElementById('pSalesChannel').value,
+                manual_link: document.getElementById('pManualLink').value,
+                image: document.getElementById('pImagePath').value,
+                remarks: document.getElementById('pRemarks').value
+            };
+
+            try {
+                const res = await fetch('./api/admin/template_add.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    alert('模板保存成功');
+                    loadTemplates();
+                    // 刷新下拉框
+                    const templateSelect = document.getElementById('pTemplateApply');
+                    templateSelect.innerHTML = '<option value="">-- 请选择模板 --</option>' + 
+                        productTemplates.map(t => `<option value="${t.id}">${t.template_name}</option>`).join('');
+                }
+            } catch (e) { alert('保存模板失败'); }
+        }
+
+        async function deleteTemplate(id) {
+            if (!confirm('确定删除该模板？')) return;
+            try {
+                const res = await fetch('./api/admin/template_delete.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                });
+                if (res.ok) loadTemplates();
+            } catch (e) { alert('删除模板失败'); }
+        }
+
+        // --- Gallery Logic ---
+        async function loadGallery() {
+            try {
+                const res = await fetch('./api/admin/gallery.php');
+                galleryImages = await res.json();
+                renderGallery();
+            } catch (e) { console.error(e); }
+        }
+
+        function renderGallery() {
+            const list = document.getElementById('galleryList');
+            if (galleryImages.length === 0) {
+                list.innerHTML = '<div class="col-12 text-center text-muted p-5">图库暂无图片，请先上传</div>';
+                return;
+            }
+            list.innerHTML = galleryImages.map(img => `
+                <div class="col-3 text-center">
+                    <div class="gallery-item border rounded p-1" onclick="selectFromGallery('${escapeHTML(img.path)}', '${escapeHTML(img.url)}'); return false;" style="cursor:pointer;">
+                        <img src="${escapeHTML(img.url)}" class="img-fluid rounded" style="width:80px; height:80px; object-fit:cover;">
+                        <div class="small text-truncate mt-1" style="font-size: 0.7rem;">${escapeHTML(img.name)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectFromGallery(path, url) {
+            document.getElementById('pImagePath').value = path;
+            document.getElementById('imagePreview').src = url;
+            document.getElementById('imagePreviewContainer').style.display = 'block';
+            document.getElementById('uploadStatus').innerText = '已从图库选择';
+            
+            const galleryEl = document.getElementById('galleryModal');
+            const modal = bootstrap.Modal.getInstance(galleryEl) || new bootstrap.Modal(galleryEl);
+            modal.hide();
+            return false;
+        }
+
+        function openGallery() {
+            const galleryEl = document.getElementById('galleryModal');
+            const galleryModal = bootstrap.Modal.getOrCreateInstance(galleryEl, {
+                backdrop: false
+            });
+            galleryModal.show();
+        }
+
+        // --- Product Types Logic ---
+        async function loadTypes() {
+            try {
+                const res = await fetch('./api/admin/type_list.php');
+                productTypes = await res.json();
+                renderTypes();
+            } catch (e) { console.error(e); }
+        }
+
+        function renderTypes() {
+            const list = document.getElementById('typeList');
+            list.innerHTML = productTypes.map(t => `
+                <tr>
+                    <td>${t.id}</td>
+                    <td>${escapeHTML(t.type_name)}</td>
+                    <td><code>${escapeHTML(t.sn_prefix)}</code></td>
+                    <td>${escapeHTML(t.created_at)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-black me-2" onclick="editType(${t.id})">修改</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteType(${t.id})">删除</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // 同时也更新筛选下拉框
+            const filterType = document.getElementById('filterType');
+            const currentVal = filterType.value;
+            filterType.innerHTML = '<option value="">所有类型</option>' + 
+                productTypes.map(t => `<option value="${escapeHTML(t.type_name)}">${escapeHTML(t.type_name)}</option>`).join('');
+            filterType.value = currentVal;
+        }
+
+        function resetTypeForm() {
+            document.getElementById('typeForm').reset();
+            document.getElementById('typeId').value = '';
+            document.getElementById('typeModalTitle').innerText = '添加产品类型';
+        }
+
+        async function saveType() {
+            const id = document.getElementById('typeId').value;
+            const data = {
+                id: id,
+                type_name: document.getElementById('typeName').value,
+                sn_prefix: document.getElementById('typePrefix').value.toUpperCase()
+            };
+            const url = id ? './api/admin/type_edit.php' : './api/admin/type_add.php';
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('typeModal')).hide();
+                    loadTypes();
+                } else { const result = await res.json(); alert('失败: ' + result.error); }
+            } catch (e) { alert('出错'); }
+        }
+
+        function editType(id) {
+            const t = productTypes.find(i => i.id == id);
+            if (!t) return;
+            document.getElementById('typeId').value = t.id;
+            document.getElementById('typeName').value = t.type_name;
+            document.getElementById('typePrefix').value = t.sn_prefix;
+            document.getElementById('typeModalTitle').innerText = '修改产品类型';
+            new bootstrap.Modal(document.getElementById('typeModal')).show();
+        }
+
+        async function deleteType(id) {
+            if (!confirm('确定删除该类型吗？如果已有产品使用此类型将无法删除。')) return;
+            try {
+                const res = await fetch('./api/admin/type_delete.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                });
+                if (res.ok) loadTypes();
+                else { const result = await res.json(); alert('失败: ' + result.error); }
+            } catch (e) { alert('出错'); }
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('确定删除？')) return;
+            try {
+                const res = await fetch('./api/admin/delete.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                });
+                if (res.ok) loadProducts();
+                else { const result = await res.json(); alert('失败: ' + result.error); }
+            } catch (e) { alert('出错'); }
+        }
+
+        // --- Admins Logic ---
+        async function loadAdmins() {
+            try {
+                const res = await fetch('./api/admin/admin_list.php');
+                admins = await res.json();
+                renderAdmins();
+            } catch (e) { console.error(e); }
+        }
+
+        function renderAdmins() {
+            const list = document.getElementById('adminList');
+            const isAdmin = currentAdminUsername === 'admin';
+            
+            list.innerHTML = admins.map(a => `
+                <tr>
+                    <td>${a.id}</td>
+                    <td>${escapeHTML(a.username)}</td>
+                    <td>${escapeHTML(a.created_at)}</td>
+                    ${isAdmin ? `
+                    <td>
+                        <button class="btn btn-sm btn-outline-black me-2" onclick="editAdmin(${a.id})">修改</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAdmin(${a.id})">删除</button>
+                    </td>
+                    ` : '<td class="admin-only-cell" style="display:none;"></td>'}
+                </tr>
+            `).join('');
+        }
+
+        function resetAdminForm() {
+            document.getElementById('adminForm').reset();
+            document.getElementById('adminId').value = '';
+            document.getElementById('adminModalTitle').innerText = '添加管理员';
+            document.getElementById('adminPassword').placeholder = '请输入密码';
+        }
+
+        async function saveAdmin() {
+            const id = document.getElementById('adminId').value;
+            const data = {
+                id: id,
+                username: document.getElementById('adminUsername').value,
+                password: document.getElementById('adminPassword').value
+            };
+            const url = id ? './api/admin/admin_edit.php' : './api/admin/admin_add.php';
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    alert('保存成功');
+                    bootstrap.Modal.getInstance(document.getElementById('adminModal')).hide();
+                    loadAdmins();
+                } else { alert('失败: ' + result.error); }
+            } catch (e) { alert('出错'); }
+        }
+
+        function editAdmin(id) {
+            const a = admins.find(i => i.id == id);
+            if (!a) return;
+            document.getElementById('adminId').value = a.id;
+            document.getElementById('adminUsername').value = a.username;
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminPassword').placeholder = '留空则不修改';
+            document.getElementById('adminModalTitle').innerText = '修改管理员';
+            new bootstrap.Modal(document.getElementById('adminModal')).show();
+        }
+
+        async function deleteAdmin(id) {
+            if (!confirm('确定删除该管理员吗？')) return;
+            try {
+                const res = await fetch('./api/admin/admin_delete.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                });
+                const result = await res.json();
+                if (res.ok) loadAdmins();
+                else alert('失败: ' + result.error);
+            } catch (e) { alert('出错'); }
+        }
+
+        // --- Logs Logic ---
+        async function loadLogs(page = 1) {
+            currentLogPage = page;
+            try {
+                const res = await fetch(`./api/admin/log_list.php?page=${currentLogPage}&limit=${logPageSize}`);
+                const data = await res.json();
+                if (res.ok) {
+                    systemLogs = data.logs;
+                    totalLogs = data.total;
+                    
+                    // 更新配置 UI (如果是 admin)
+                    if (currentAdminUsername === 'admin') {
+                        document.getElementById('logEnabledSwitch').checked = data.configs.log_enabled === '1';
+                        document.getElementById('logRetentionInput').value = data.configs.log_retention_days;
+                    }
+                    
+                    renderLogs();
+                    renderLogPagination();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function renderLogs() {
+            const list = document.getElementById('logList');
+            if (systemLogs.length === 0) {
+                list.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted">暂无日志记录</td></tr>';
+                return;
+            }
+            list.innerHTML = systemLogs.map(log => `
+                <tr>
+                    <td><small class="text-muted">${escapeHTML(log.created_at)}</small></td>
+                    <td><span class="badge bg-light text-dark">${escapeHTML(log.username)}</span></td>
+                    <td><span class="fw-bold">${escapeHTML(log.action)}</span></td>
+                    <td><small>${escapeHTML(log.details || '-')}</small></td>
+                    <td><code>${escapeHTML(log.ip_address || '-')}</code></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderLogPagination() {
+            const totalPages = Math.ceil(totalLogs / logPageSize);
+            const info = document.getElementById('logPaginationInfo');
+            const list = document.getElementById('logPagination');
+            
+            info.innerText = `共 ${totalLogs} 条日志，当前第 ${currentLogPage} / ${totalPages || 1} 页`;
+            
+            let html = '';
+            html += `<li class="page-item ${currentLogPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadLogs(${currentLogPage - 1}); return false;">上一页</a>
+            </li>`;
+            
+            let start = Math.max(1, currentLogPage - 2);
+            let end = Math.min(totalPages, start + 4);
+            if (end - start < 4) start = Math.max(1, end - 4);
+            
+            for (let i = start; i <= end; i++) {
+                if (i < 1) continue;
+                html += `<li class="page-item ${i === currentLogPage ? 'active' : ''}">
+                    <a class="page-link ${i === currentLogPage ? 'bg-black border-black' : ''}" href="#" onclick="loadLogs(${i}); return false;">${i}</a>
+                </li>`;
+            }
+            
+            html += `<li class="page-item ${currentLogPage >= totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="loadLogs(${currentLogPage + 1}); return false;">下一页</a>
+            </li>`;
+            
+            list.innerHTML = html;
+        }
+
+        async function updateLogConfig() {
+            if (currentAdminUsername !== 'admin') return;
+            
+            const enabled = document.getElementById('logEnabledSwitch').checked;
+            const days = document.getElementById('logRetentionInput').value;
+            
+            try {
+                const res = await fetch('./api/admin/log_config.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        log_enabled: enabled,
+                        log_retention_days: days
+                    })
+                });
+                if (res.ok) {
+                    // 配置更新成功，不需要弹窗，静默刷新即可
+                } else {
+                    const result = await res.json();
+                    alert('配置更新失败: ' + result.error);
+                }
+            } catch (e) { alert('配置更新出错'); }
+        }
+
+        async function clearLogs() {
+            if (currentAdminUsername !== 'admin') return;
+            if (!confirm('确定要清空所有系统日志吗？此操作不可恢复。')) return;
+            
+            try {
+                const res = await fetch('./api/admin/log_config.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ clear_logs: true })
+                });
+                if (res.ok) {
+                    alert('日志已清空');
+                    loadLogs(1);
+                } else {
+                    const result = await res.json();
+                    alert('清空失败: ' + result.error);
+                }
+            } catch (e) { alert('清空出错'); }
+        }
+    </script>
+</body>
+</html>
