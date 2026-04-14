@@ -151,4 +151,131 @@
                         <div class="col-6">
                             <div class="info-label">产品类型</div>
                             <div id="pType" class="info-value">-</div>
-        
+                        </div>
+                        <div class="col-6">
+                            <div class="info-label">销售渠道</div>
+                            <div id="pSalesChannel" class="info-value">-</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="info-label">序列号</div>
+                            <div id="pSn" class="info-value">-</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="info-label">SN 码 (物理标签)</div>
+                            <div id="pSnCode" class="info-value">-</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="info-label">制造日期</div>
+                            <div id="pMfgDate" class="info-value">-</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="info-label">保修截止日期 (推测)</div>
+                            <div id="pExpiryDate" class="info-value text-danger fw-bold">-</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="info-label">保修状态</div>
+                            <div id="pWarrantyStatus" class="info-value fw-bold">-</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="info-label">电子手册</div>
+                            <div id="pManual" class="info-value">
+                                <a id="pManualLink" href="#" target="_blank" class="btn btn-sm btn-outline-dark">点击查看电子手册</a>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="info-label">备注说明</div>
+                            <div id="pRemarks" class="info-value">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorMsg" class="alert alert-danger text-center mx-auto" style="max-width: 600px; display: none; border-radius: 15px;">
+            您输入的序列号不正确或非正品
+        </div>
+    </div>
+
+    <footer class="footer">
+        &copy; 2026 正版查询中心. 保留所有权利.
+    </footer>
+
+    <!-- Bootstrap 5 JS & Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function queryProduct() {
+            const sn = document.getElementById('snInput').value.trim();
+            if (!sn) {
+                alert('请输入序列号');
+                return;
+            }
+
+            const loading = document.getElementById('loading');
+            const resultCard = document.getElementById('resultCard');
+            const errorMsg = document.getElementById('errorMsg');
+
+            loading.style.display = 'block';
+            resultCard.style.display = 'none';
+            errorMsg.style.display = 'none';
+
+            try {
+                const response = await fetch(`./api/query.php?sn=${encodeURIComponent(sn)}`);
+                let data;
+                
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = { error: '您输入的序列号不正确或非正品' };
+                }
+
+                loading.style.display = 'none';
+
+                if (response.ok) {
+                    document.getElementById('pName').innerText = data.product_name;
+                    document.getElementById('pModel').innerText = data.product_model;
+                    document.getElementById('pType').innerText = data.product_type;
+                    document.getElementById('pSalesChannel').innerText = data.sales_channel || '官方渠道';
+                    document.getElementById('pSn').innerText = data.sn;
+                    document.getElementById('pSnCode').innerText = data.sn_code || '未绑定';
+                    document.getElementById('pMfgDate').innerText = data.manufacturing_date;
+                    document.getElementById('pExpiryDate').innerText = data.expiry_date;
+                    
+                    // 计算保修状态
+                    const expiryDate = new Date(data.expiry_date);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); // 仅比较日期
+                    
+                    const statusEl = document.getElementById('pWarrantyStatus');
+                    if (expiryDate >= today) {
+                        statusEl.innerText = '保修期内';
+                        statusEl.className = 'info-value fw-bold text-success';
+                    } else {
+                        statusEl.innerText = '已过保';
+                        statusEl.className = 'info-value fw-bold text-secondary';
+                    }
+                    
+                    if (data.manual_link) {
+                        document.getElementById('pManualLink').href = data.manual_link;
+                        document.getElementById('pManual').style.display = 'block';
+                    } else {
+                        document.getElementById('pManual').style.display = 'none';
+                    }
+                    
+                    document.getElementById('pRemarks').innerText = data.remarks || '无';
+                    document.getElementById('pImg').src = data.image_url || 'https://via.placeholder.com/400x300?text=No+Image';
+                    
+                    resultCard.style.display = 'block';
+                } else {
+                    errorMsg.innerText = (data && data.error) ? data.error : '您输入的序列号不正确或非正品';
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                console.error('Fetch error:', error);
+                errorMsg.innerText = '您输入的序列号不正确或非正品';
+                errorMsg.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
