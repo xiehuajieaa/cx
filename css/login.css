@@ -1,0 +1,358 @@
+:root {
+    --primary-color: #000000;
+    --primary-light: #2c2c2c;
+    --bg-light: #f8f9fa;
+    --text-muted: #888;
+    --border-light: #e8e8e8;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans SC', sans-serif;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-light);
+}
+
+/* ========== 登录容器 - 左右分栏 ========== */
+.login-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    max-width: 1200px;
+    max-height: 700px;
+    background-color: white;
+    border-radius: 0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+/* ========== 左侧品牌区 ========== */
+.login-left {
+    flex: 1;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-left::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.login-left-content {
+    position: relative;
+    z-index: 1;
+    max-width: 420px;
+}
+
+.brand-icon {
+    font-size: 3.5rem;
+    margin-bottom: 24px;
+    opacity: 0.95;
+}
+
+.brand-icon i {
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+
+.login-left h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+}
+
+.brand-subtitle {
+    font-size: 0.85rem;
+    opacity: 0.6;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+}
+
+.brand-desc {
+    font-size: 0.95rem;
+    opacity: 0.7;
+    line-height: 1.8;
+    margin-bottom: 40px;
+}
+
+.brand-features {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.feature-item:hover {
+    opacity: 1;
+}
+
+.feature-item i {
+    font-size: 1.1rem;
+    color: #4CAF50;
+}
+
+/* ========== 右侧登录表单区 ========== */
+.login-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    background-color: white;
+}
+
+.login-form-wrapper {
+    width: 100%;
+    max-width: 380px;
+}
+
+.login-right h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.login-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 36px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 输入框组 */
+.input-group-custom {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    color: #bbb;
+    z-index: 5;
+    transition: color 0.3s;
+}
+
+.input-group-custom .form-control {
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+    background-color: #fafafa;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+}
+
+.input-group-custom .form-control:focus {
+    outline: none;
+    border-color: #999;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+}
+
+.input-group-custom .form-control:focus + .input-icon,
+.input-group-custom .form-control:focus ~ .input-icon {
+    color: var(--primary-color);
+}
+
+.input-group-custom:focus-within .input-icon {
+    color: var(--primary-color);
+}
+
+/* 登录按钮 */
+.btn-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 8px;
+}
+
+.btn-login:hover {
+    background-color: var(--primary-light);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+/* 错误提示 */
+.alert {
+    display: none;
+    margin-top: 20px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    padding: 12px 16px;
+    text-align: center;
+}
+
+/* 返回首页 */
+.back-home {
+    display: inline-block;
+    margin-top: 32px;
+    color: #aaa;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.3s;
+}
+
+.back-home:hover {
+    color: var(--primary-color);
+}
+
+/* ========== 自适应 ========== */
+
+/* 平板及以下 - 上下布局 */
+@media (max-width: 768px) {
+    body {
+        align-items: flex-start;
+    }
+
+    .login-container {
+        flex-direction: column;
+        max-height: none;
+        border-radius: 0;
+        max-width: 100%;
+    }
+
+    .login-left {
+        flex: none;
+        padding: 40px 30px;
+        text-align: center;
+    }
+
+    .login-left h1 {
+        font-size: 1.5rem;
+    }
+
+    .brand-desc {
+        font-size: 0.85rem;
+        margin-bottom: 28px;
+    }
+
+    .brand-features {
+        display: none;
+    }
+
+    .brand-icon {
+        font-size: 2.5rem;
+        margin-bottom: 16px;
+    }
+
+    .brand-subtitle {
+        margin-bottom: 20px;
+    }
+
+    .login-right {
+        flex: none;
+        padding: 36px 30px 50px;
+    }
+
+    .login-right h2 {
+        font-size: 1.4rem;
+    }
+
+    .login-subtitle {
+        margin-bottom: 28px;
+    }
+
+    .login-form-wrapper {
+        max-width: 100%;
+    }
+}
+
+/* 超小屏手机 */
+@media (max-width: 480px) {
+    .login-left {
+        padding: 30px 20px;
+    }
+
+    .login-left h1 {
+        font-size: 1.3rem;
+    }
+
+    .login-right {
+        padding: 28px 20px 44px;
+    }
+}
+
+/* 登录框内部备案信息 */
+.login-beian {
+    display: none;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+    text-align: center;
+    font-size: 0.78rem;
+    color: #aaa;
+}
+
+.login-beian-copyright {
+    margin-bottom: 4px;
+}
+
+.login-beian-links a {
+    color: #aaa;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.login-beian-links a:hover {
+    color: #666;
+}
+
+/* 大屏桌面 - 居中圆角卡片 */
+@media (min-width: 1200px) {
+    .login-container {
+        border-radius: 20px;
+    }
+}

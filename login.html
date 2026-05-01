@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录 - 正版查询系统</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <!-- 左侧品牌区 -->
+        <div class="login-left">
+            <div class="login-left-content">
+                <div class="brand-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h1>正版查询系统</h1>
+                <p class="brand-subtitle">Product Authentication Platform</p>
+                <p class="brand-desc">为您的产品提供安全可靠的真伪验证服务，<br>保障消费者权益，维护品牌信誉。</p>
+                <div class="brand-features">
+                    <div class="feature-item">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>一物一码，精准溯源</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>实时查询，即时反馈</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>数据安全，防伪可靠</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧登录表单区 -->
+        <div class="login-right">
+            <div class="login-form-wrapper">
+                <h2>管理员登录</h2>
+                <p class="login-subtitle">请输入您的账号密码进入后台</p>
+
+                <form id="loginForm" class="login-form">
+                    <div class="input-group-custom">
+                        <i class="bi bi-person input-icon"></i>
+                        <input type="text" id="username" class="form-control" placeholder="用户名" required autocomplete="username">
+                    </div>
+                    <div class="input-group-custom">
+                        <i class="bi bi-lock input-icon"></i>
+                        <input type="password" id="password" class="form-control" placeholder="密码" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-login">
+                        进入后台
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+                </form>
+
+                <div id="errorMsg" class="alert alert-danger"></div>
+
+                <a href="index.html" class="back-home">
+                    <i class="bi bi-house-door me-1"></i>返回网站首页
+                </a>
+
+                <!-- 备案信息 -->
+                <div class="login-beian" id="loginBeian">
+                    <div class="login-beian-copyright">© 2026 正版查询中心. 保留所有权利.</div>
+                    <div class="login-beian-links"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/login.js"></script>
+    <script>
+        // 加载站点配置（ICP/公安备案/版权信息）
+        (async function() {
+            try {
+                const res = await fetch('./api/site_config.php');
+                const data = await res.json();
+                const beianEl = document.getElementById('loginBeian');
+                if (!beianEl) return;
+                if (data.copyright_text) {
+                    beianEl.querySelector('.login-beian-copyright').textContent = data.copyright_text;
+                }
+                const linksEl = beianEl.querySelector('.login-beian-links');
+                let html = '';
+                if (data.icp_no) html += `<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">${data.icp_no}</a>`;
+                if (data.gongan_no) html += (html ? ' &nbsp; ' : '') + `<a href="https://beian.mps.gov.cn/#/query/webSearch" target="_blank" rel="noopener">${data.gongan_no}</a>`;
+                linksEl.innerHTML = html;
+                if (html || data.copyright_text) {
+                    beianEl.style.display = 'block';
+                }
+            } catch(e) {}
+        })();
+    </script>
+</body>
+</html>

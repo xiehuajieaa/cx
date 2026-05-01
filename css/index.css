@@ -1,0 +1,100 @@
+:root {
+    --primary-color: #000000;
+    --bg-color: #ffffff;
+    --card-bg: #f8f9fa;
+}
+body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background-color: var(--bg-color);
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.header {
+    padding: 40px 0;
+    text-align: center;
+}
+.header h1 {
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--primary-color);
+}
+.search-container {
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+.input-group {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-radius: 50px;
+    overflow: hidden;
+}
+.form-control {
+    border: none;
+    padding: 15px 25px;
+    font-size: 1.1rem;
+}
+.form-control:focus {
+    box-shadow: none;
+}
+.btn-search {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0 30px;
+    font-weight: 500;
+    border: none;
+    transition: all 0.3s;
+}
+.btn-search:hover {
+    background-color: #333;
+    color: white;
+}
+.result-card {
+    display: none;
+    background-color: white;
+    border: 1px solid #eee;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    margin-bottom: 50px;
+}
+.product-img {
+    max-width: 100%;
+    max-height: 500px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+.info-label {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+}
+.info-value {
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 15px;
+}
+.status-badge {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+.footer {
+    margin-top: auto;
+    padding: 30px 0;
+    text-align: center;
+    color: #999;
+    font-size: 0.9rem;
+    border-top: 1px solid #f0f0f0;
+}
+@media (max-width: 768px) {
+    .header h1 { font-size: 1.8rem; }
+    .result-card { padding: 20px; }
+}

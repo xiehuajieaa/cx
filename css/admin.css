@@ -1,0 +1,67 @@
+/* ============================================================
+   Admin CSS - 最小必要样式（配合 Bootstrap 5）
+   ============================================================ */
+
+/* ---------- 导航栏文字可见性 ---------- */
+.navbar-light .navbar-nav .nav-link {
+    color: rgba(0, 0, 0, 0.7) !important;
+    font-weight: 500;
+}
+.navbar-light .navbar-nav .nav-link:hover {
+    color: #000 !important;
+}
+.navbar-light .navbar-nav .nav-link.active {
+    color: #0d6efd !important;
+    font-weight: 600;
+}
+
+/* ---------- 视图切换 ---------- */
+.section-view { display: none; }
+.section-view.active { display: block; }
+
+/* ---------- 按钮补充 ---------- */
+.btn-outline-black {
+    color: #212529;
+    border-color: #212529;
+    background: transparent;
+}
+.btn-outline-black:hover {
+    color: #fff;
+    background: #212529;
+    border-color: #212529;
+}
+
+/* ---------- 分页补充 ---------- */
+.bg-black {
+    background-color: #212529 !important;
+}
+.border-black {
+    border-color: #212529 !important;
+}
+
+/* ---------- 表格图片缩略图 ---------- */
+.product-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #dee2e6;
+}
+
+/* ---------- 图库 ---------- */
+.gallery-item {
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.gallery-item:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ---------- Gallery Modal z-index ---------- */
+#galleryModal {
+    z-index: 1070;
+}
+#galleryModal .modal-backdrop {
+    display: none;
+}
